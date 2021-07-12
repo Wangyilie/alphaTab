@@ -2,7 +2,6 @@ import * as ts from 'typescript';
 import cloneEmit from './CloneEmitter';
 import serializerEmit from './SerializerEmitter';
 import transpiler from '../TranspilerBase';
-import * as path from 'path';
 import * as fs from 'fs';
 
 transpiler([{

@@ -6,17 +6,18 @@
 import * as path from 'path';
 import * as ts from 'typescript';
 import createEmitter from './EmitterBase';
-import { addNewLines } from '../BuilderHelpers';
-import { isPrimitiveType } from '../BuilderHelpers';
-import { hasFlag } from '../BuilderHelpers';
-import { getTypeWithNullableInfo } from '../BuilderHelpers';
-import { isTypedArray } from '../BuilderHelpers';
-import { unwrapArrayItemType } from '../BuilderHelpers';
-import { isMap } from '../BuilderHelpers';
-import { isEnumType } from '../BuilderHelpers';
-import { isNumberType } from '../BuilderHelpers';
-import { wrapToNonNull } from '../BuilderHelpers';
-
+import {
+    addNewLines,
+    isPrimitiveType,
+    hasFlag,
+    getTypeWithNullableInfo,
+    isTypedArray,
+    unwrapArrayItemType,
+    isMap,
+    isEnumType,
+    isNumberType,
+    wrapToNonNull
+} from '../BuilderHelpers';
 interface JsonProperty {
     partialNames: boolean;
     property: ts.PropertyDeclaration;
@@ -53,7 +54,7 @@ function createStringUnknownMapNode(): ts.TypeNode {
 }
 
 function findModule(type: ts.Type, options: ts.CompilerOptions) {
-    if (type.symbol) {
+    if (type.symbol?.declarations) {
         for (const decl of type.symbol.declarations) {
             const file = decl.getSourceFile();
             if (file) {
@@ -680,7 +681,7 @@ function generateSetPropertyBody(
             const collectionAddMethod = ts
                 .getJSDocTags(prop.property)
                 .filter(t => t.tagName.text === 'json_add')
-                .map(t => t.comment ?? '')[0];
+                .map(t => t.comment ?? '')[0]?.toString();
 
             // obj.fieldName = [];
             // for(const i of value) {
@@ -836,7 +837,7 @@ function generateSetPropertyBody(
             const collectionAddMethod = ts
                 .getJSDocTags(prop.property)
                 .filter(t => t.tagName.text === 'json_add')
-                .map(t => t.comment ?? '')[0];
+                .map(t => t.comment ?? '')[0]?.toString();
 
             caseStatements.push(
                 assignField(
@@ -1251,7 +1252,7 @@ export default createEmitter('json', (program, input) => {
                         property: propertyDeclaration,
                         jsonNames: jsonNames,
                         partialNames: !!ts.getJSDocTags(member).find(t => t.tagName.text === 'json_partial_names'),
-                        target: ts.getJSDocTags(member).find(t => t.tagName.text === 'target')?.comment
+                        target: ts.getJSDocTags(member).find(t => t.tagName.text === 'target')?.comment?.toString()
                     });
                 }
             }

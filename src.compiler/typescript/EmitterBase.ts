@@ -38,7 +38,7 @@ export default function createEmitter(jsDocMarker: string, generate: (program: t
             getScriptFileNames: () => [targetFileName],
             getScriptVersion: fileName => result.languageVersion.toString(),
             getScriptSnapshot: fileName => {
-                if (fileName != targetFileName) {
+                if (fileName !== targetFileName) {
                     return undefined;
                 }
 

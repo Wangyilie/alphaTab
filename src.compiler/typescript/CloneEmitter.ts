@@ -5,9 +5,7 @@
 import * as path from 'path';
 import * as ts from 'typescript';
 import createEmitter from './EmitterBase'
-import { addNewLines } from '../BuilderHelpers';
-import { getTypeWithNullableInfo } from '../BuilderHelpers';
-import { unwrapArrayItemType } from '../BuilderHelpers';
+import { addNewLines, getTypeWithNullableInfo, unwrapArrayItemType } from '../BuilderHelpers';
 
 function removeExtension(fileName: string) {
     return fileName.substring(0, fileName.lastIndexOf('.'));
@@ -73,7 +71,7 @@ function generateClonePropertyStatements(prop: ts.PropertyDeclaration, typeCheck
         if (isClonable(arrayItemType)) {
             const collectionAddMethod = ts.getJSDocTags(prop)
                 .filter(t => t.tagName.text === 'clone_add')
-                .map(t => t.comment ?? "")[0];
+                .map(t => t.comment ?? "")[0]?.toString();
 
             importer(arrayItemType.symbol!.name + "Cloner", './' + arrayItemType.symbol!.name + "Cloner");
             const loopItems = [
