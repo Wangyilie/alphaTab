@@ -280,6 +280,24 @@ function setupControl(selector) {
         };
     });
 
+    control.querySelectorAll('.at-staff-options a').forEach(function (a) {
+        a.onclick = function (e) {
+            e.preventDefault();
+            const settings = at.settings;
+            switch (e.target.dataset.layout) {
+                case 'numbered':
+                    settings.core.numbered = true;
+                    break;
+                case 'staff':
+                    settings.core.numbered = false;
+                    break;
+            }
+
+            at.updateSettings();
+            at.render();
+        };
+    });
+
     $(control).find('[data-toggle="tooltip"]').tooltip();
 
     return at;

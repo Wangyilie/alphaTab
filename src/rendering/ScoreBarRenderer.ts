@@ -117,8 +117,12 @@ export class ScoreBarRenderer extends BarRendererBase {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
+        // canvas 以小节为单位
         super.paint(cx, cy, canvas);
-        this.paintBeams(cx, cy, canvas);
+
+        // 绘制音符符杆
+        // if (this.scoreRenderer.settings.core.numbered) return;
+        this.paintBeams(cx, cy, canvas, this.scoreRenderer.settings.core.numbered);
         this.paintTuplets(cx, cy, canvas);
     }
 
@@ -133,25 +137,25 @@ export class ScoreBarRenderer extends BarRendererBase {
         }
     }
 
-    private paintBeams(cx: number, cy: number, canvas: ICanvas): void {
+    private paintBeams(cx: number, cy: number, canvas: ICanvas, isNumbered?: boolean): void {
         for (let i: number = 0, j: number = this.helpers.beamHelpers.length; i < j; i++) {
             let v: BeamingHelper[] = this.helpers.beamHelpers[i];
             for (let k: number = 0, l: number = v.length; k < l; k++) {
                 let h: BeamingHelper = v[k];
-                this.paintBeamHelper(cx + this.beatGlyphsStart, cy, canvas, h);
+                this.paintBeamHelper(cx + this.beatGlyphsStart, cy, canvas, h, isNumbered);
             }
         }
     }
 
-    private paintBeamHelper(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper): void {
+    private paintBeamHelper(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper, isNumbered?: boolean): void {
         canvas.color = h.voice!.index === 0 ? this.resources.mainGlyphColor : this.resources.secondaryGlyphColor;
         // TODO: draw stem at least at the center of the score staff.
         // check if we need to paint simple footer
         if (!h.isRestBeamHelper) {
             if (h.beats.length === 1) {
-                this.paintFlag(cx, cy, canvas, h);
+                this.paintFlag(cx, cy, canvas, h, isNumbered);
             } else {
-                this.paintBar(cx, cy, canvas, h);
+                this.paintBar(cx, cy, canvas, h, isNumbered);
             }
         }
     }
@@ -533,7 +537,7 @@ export class ScoreBarRenderer extends BarRendererBase {
     }
 
 
-    private paintBar(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper): void {
+    private paintBar(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper, isNumbered?: boolean): void {
         for (let i: number = 0, j: number = h.beats.length; i < j; i++) {
             let beat: Beat = h.beats[i];
             let isGrace: boolean = beat.graceType !== GraceType.None;
@@ -552,10 +556,13 @@ export class ScoreBarRenderer extends BarRendererBase {
             let y2: number = cy + this.y;
             y2 += this.calculateBeamY(h, beatLineX);
             canvas.lineWidth = BarRendererBase.StemWidth * this.scale;
-            canvas.beginPath();
-            canvas.moveTo(cx + this.x + beatLineX, y1);
-            canvas.lineTo(cx + this.x + beatLineX, y2);
-            canvas.stroke();
+            // 简谱不绘制符杆
+            if (!isNumbered) {
+                canvas.beginPath();
+                canvas.moveTo(cx + this.x + beatLineX, y1);
+                canvas.lineTo(cx + this.x + beatLineX, y2);
+                canvas.stroke();
+            }
             canvas.lineWidth = this.scale;
             let fingeringY: number = y2;
             if (direction === BeamDirection.Down) {
@@ -564,13 +571,13 @@ export class ScoreBarRenderer extends BarRendererBase {
                 fingeringY -= canvas.font.size * 1.5;
             }
             this.paintFingering(canvas, beat, cx + this.x + beatLineX, direction, fingeringY);
-            let brokenBarOffset: number = 6 * this.scale * scaleMod;
+            let brokenBarOffset: number = (isNumbered ? 10 : 6) * this.scale * scaleMod;
             let barSpacing: number =
                 (BarRendererBase.BeamSpacing + BarRendererBase.BeamThickness) * this.scale * scaleMod;
             let barSize: number = BarRendererBase.BeamThickness * this.scale * scaleMod;
             let barCount: number = ModelUtils.getIndex(beat.duration) - 2;
             let barStart: number = cy + this.y;
-            if (direction === BeamDirection.Down) {
+            if (direction === BeamDirection.Down && !isNumbered) {
                 barSpacing = -barSpacing;
                 barSize = -barSize;
             }
@@ -598,11 +605,11 @@ export class ScoreBarRenderer extends BarRendererBase {
                     barEndY = barY + this.calculateBeamY(h, barEndX);
                     ScoreBarRenderer.paintSingleBar(
                         canvas,
-                        cx + this.x + barStartX,
-                        barStartY,
-                        cx + this.x + barEndX,
-                        barEndY,
-                        barSize
+                        cx + this.x + barStartX - (isNumbered ? 5 : 0),
+                        isNumbered ? barY + 40 : barStartY,
+                        cx + this.x + barEndX + (isNumbered ? 5 : 0),
+                        isNumbered ? barY + 40 : barEndY,
+                        isNumbered ? 2 : barSize
                     );
                 } else if (i > 0 && !BeamingHelper.isFullBarJoin(beat, h.beats[i - 1], barIndex)) {
                     barStartX = beatLineX - brokenBarOffset;
@@ -611,11 +618,11 @@ export class ScoreBarRenderer extends BarRendererBase {
                     barEndY = barY + this.calculateBeamY(h, barEndX);
                     ScoreBarRenderer.paintSingleBar(
                         canvas,
-                        cx + this.x + barStartX,
-                        barStartY,
-                        cx + this.x + barEndX,
-                        barEndY,
-                        barSize
+                        cx + this.x + barStartX - (isNumbered ? 5 : 0),
+                        isNumbered ? barY + 40 : barStartY,
+                        cx + this.x + barEndX + (isNumbered ? 5 : 0),
+                        isNumbered ? barY + 40 : barEndY,
+                        isNumbered ? 2 : barSize
                     );
                 }
             }
@@ -632,7 +639,8 @@ export class ScoreBarRenderer extends BarRendererBase {
         canvas.fill();
     }
 
-    private paintFlag(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper): void {
+    private paintFlag(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper, isNumbered?: boolean): void {
+        // console.log('paintFlag: ', h)
         let beat: Beat = h.beats[0];
         if (
             beat.graceType === GraceType.BendGrace ||
@@ -665,33 +673,66 @@ export class ScoreBarRenderer extends BarRendererBase {
         if (!h.hasLine) {
             return;
         }
-        canvas.lineWidth = BarRendererBase.StemWidth * this.scale;
-        canvas.beginPath();
-        canvas.moveTo(cx + this.x + beatLineX, cy + this.y + topY);
-        canvas.lineTo(cx + this.x + beatLineX, cy + this.y + bottomY);
-        canvas.stroke();
-        canvas.lineWidth = this.scale;
-        if (beat.graceType === GraceType.BeforeBeat) {
-            let graceSizeY: number = 15 * this.scale;
-            let graceSizeX: number = 12 * this.scale;
+        if (!isNumbered) {
+            canvas.lineWidth = BarRendererBase.StemWidth * this.scale;
             canvas.beginPath();
-            if (direction === BeamDirection.Down) {
-                canvas.moveTo(cx + this.x + beatLineX - graceSizeX / 2, cy + this.y + bottomY - graceSizeY);
-                canvas.lineTo(cx + this.x + beatLineX + graceSizeX / 2, cy + this.y + bottomY);
-            } else {
-                canvas.moveTo(cx + this.x + beatLineX - graceSizeX / 2, cy + this.y + topY + graceSizeY);
-                canvas.lineTo(cx + this.x + beatLineX + graceSizeX / 2, cy + this.y + topY);
-            }
+            canvas.moveTo(cx + this.x + beatLineX, cy + this.y + topY);
+            canvas.lineTo(cx + this.x + beatLineX, cy + this.y + bottomY);
             canvas.stroke();
+            canvas.lineWidth = this.scale;
+            if (beat.graceType === GraceType.BeforeBeat) {
+                let graceSizeY: number = 15 * this.scale;
+                let graceSizeX: number = 12 * this.scale;
+                canvas.beginPath();
+                if (direction === BeamDirection.Down) {
+                    canvas.moveTo(cx + this.x + beatLineX - graceSizeX / 2, cy + this.y + bottomY - graceSizeY);
+                    canvas.lineTo(cx + this.x + beatLineX + graceSizeX / 2, cy + this.y + bottomY);
+                } else {
+                    canvas.moveTo(cx + this.x + beatLineX - graceSizeX / 2, cy + this.y + topY + graceSizeY);
+                    canvas.lineTo(cx + this.x + beatLineX + graceSizeX / 2, cy + this.y + topY);
+                }
+                canvas.stroke();
+            }
         }
         //
         // Draw flag
         //
-        if (h.hasFlag) {
+        if (h.hasFlag && !isNumbered) {
             let glyph: FlagGlyph = new FlagGlyph(beatLineX - this.scale / 2, beamY, beat.duration, direction, isGrace);
             glyph.renderer = this;
             glyph.doLayout();
             glyph.paint(cx + this.x, cy + this.y, canvas);
+        }
+        if (isNumbered) {
+            let brokenBarOffset: number = (isNumbered ? 10 : 6) * this.scale * scaleMod;
+            let barSpacing: number =
+                (BarRendererBase.BeamSpacing + BarRendererBase.BeamThickness) * this.scale * scaleMod;
+            let barSize: number = BarRendererBase.BeamThickness * this.scale * scaleMod;
+            let barCount: number = ModelUtils.getIndex(beat.duration) - 2;
+            let barStart: number = cy + this.y;
+            if (direction === BeamDirection.Down && !isNumbered) {
+                barSpacing = -barSpacing;
+                barSize = -barSize;
+            }
+            for (let barIndex: number = 0; barIndex < barCount; barIndex++) {
+                let barStartX: number = 0;
+                let barEndX: number = 0;
+                let barStartY: number = 0;
+                let barEndY: number = 0;
+                let barY: number = barStart + barIndex * barSpacing;
+                barStartX = beatLineX - brokenBarOffset;
+                barEndX = beatLineX;
+                barStartY = barY + this.calculateBeamY(h, barStartX);
+                barEndY = barY + this.calculateBeamY(h, barEndX);
+                ScoreBarRenderer.paintSingleBar(
+                    canvas,
+                    cx + this.x + barStartX,
+                    isNumbered ? barY + 40 : barStartY,
+                    cx + this.x + barEndX + (isNumbered ? 8 : 0),
+                    isNumbered ? barY + 40 : barEndY,
+                    isNumbered ? 2 : barSize
+                );
+            }
         }
     }
 

@@ -142,5 +142,15 @@ export enum MusicFontSymbol {
     WiggleVibratoMediumFast = 0xeade,
 
     OctaveBaselineM = 0xec95,
-    OctaveBaselineB = 0xec93
+    OctaveBaselineB = 0xec93,
+
+    // 简谱
+    do = 1,
+    re = 2,
+    mi = 3,
+    fa = 4,
+    sol = 5,
+    la = 6,
+    si = 7,
+    Rest = 0
 }

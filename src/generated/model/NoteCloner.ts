@@ -47,6 +47,7 @@ export class NoteCloner {
         clone.durationPercent = original.durationPercent;
         clone.accidentalMode = original.accidentalMode;
         clone.dynamics = original.dynamics;
+        clone.numbered = original.numbered;
         return clone;
     }
 }

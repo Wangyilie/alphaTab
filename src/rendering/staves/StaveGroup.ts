@@ -243,6 +243,10 @@ export class StaveGroup {
         for (let i: number = 0, j: number = this._allStaves.length; i < j; i++) {
             this._allStaves[i].paint(cx, cy, canvas, startIndex, count);
         }
+
+        // 控制简谱下不渲染
+        if (this.layout.renderer.settings.core.numbered) return;
+
         let res: RenderingResources = this.layout.renderer.settings.display.resources;
         if (this.staves.length > 0 && startIndex === 0) {
             //

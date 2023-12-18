@@ -33,6 +33,7 @@ export class CoreSettingsSerializer {
         o.set("loglevel", obj.logLevel as number);
         o.set("useworkers", obj.useWorkers);
         o.set("includenotebounds", obj.includeNoteBounds);
+        o.set("numbered", obj.numbered);
         return o;
     }
     public static setProperty(obj: CoreSettings, property: string, v: unknown): boolean {
@@ -71,6 +72,9 @@ export class CoreSettingsSerializer {
                 return true;
             case "includenotebounds":
                 obj.includeNoteBounds = v! as boolean;
+                return true;
+            case "numbered":
+                obj.numbered = v! as boolean;
                 return true;
         }
         return false;

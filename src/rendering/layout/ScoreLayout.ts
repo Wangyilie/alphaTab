@@ -330,7 +330,7 @@ export abstract class ScoreLayout {
             canvas.color = resources.mainGlyphColor;
             canvas.font = font;
             canvas.textAlign = TextAlign.Left;
-            canvas.fillText(msg, 0, size);
+            // canvas.fillText(msg, 0, size);
         });
 
         return y + height;

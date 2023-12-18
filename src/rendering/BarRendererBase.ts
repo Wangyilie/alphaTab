@@ -398,11 +398,15 @@ export class BarRendererBase {
     }
 
     public paint(cx: number, cy: number, canvas: ICanvas): void {
-        this.paintBackground(cx, cy, canvas);
+        // 绘制五线
+        if (!this.scoreRenderer.settings.core.numbered) this.paintBackground(cx, cy, canvas);
         canvas.color = this.resources.mainGlyphColor;
-        this._preBeatGlyphs.paint(cx + this.x, cy + this.y, canvas);
+        // 绘制谱号 / 拍号
+        if (!this.scoreRenderer.settings.core.numbered) this._preBeatGlyphs.paint(cx + this.x, cy + this.y, canvas);
+
         for (const c of this._voiceContainers.values()) {
             canvas.color = c.voice.index === 0 ? this.resources.mainGlyphColor : this.resources.secondaryGlyphColor;
+            // 绘制音符
             c.paint(cx + this.x, cy + this.y, canvas);
         }
         canvas.color = this.resources.mainGlyphColor;

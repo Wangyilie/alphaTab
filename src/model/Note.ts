@@ -488,6 +488,11 @@ export class Note {
     public effectSlurOrigin: Note | null = null;
 
     /**
+     * 是否简谱音符
+     */
+    public numbered: boolean = false;
+
+    /**
      * @clone_ignore
      * @json_ignore
      */

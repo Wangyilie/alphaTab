@@ -138,7 +138,6 @@ export class ScoreRenderer implements IScoreRenderer {
         this.recreateCanvas();
         this.canvas!.lineWidth = this.settings.display.scale;
         this.canvas!.settings = this.settings;
-
         if (!this.tracks || this.tracks.length === 0 || !this.score) {
             Logger.debug('Rendering', 'Clearing rendered tracks because no score or tracks are set');
             (this.preRender as EventEmitterOfT<boolean>).trigger(false);
@@ -154,6 +153,7 @@ export class ScoreRenderer implements IScoreRenderer {
             }
             (this.preRender as EventEmitterOfT<boolean>).trigger(false);
             this.recreateLayout();
+            // TODO 1
             this.layoutAndRender();
             Logger.debug('Rendering', 'Rendering finished');
         }

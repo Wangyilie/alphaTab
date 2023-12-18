@@ -66,6 +66,7 @@ export class NoteSerializer {
         o.set("durationpercent", obj.durationPercent);
         o.set("accidentalmode", obj.accidentalMode as number);
         o.set("dynamics", obj.dynamics as number);
+        o.set("numbered", obj.numbered);
         obj.toJson(o);
         return o;
     }
@@ -179,6 +180,9 @@ export class NoteSerializer {
                 return true;
             case "dynamics":
                 obj.dynamics = JsonHelper.parseEnum<DynamicValue>(v, DynamicValue)!;
+                return true;
+            case "numbered":
+                obj.numbered = v! as boolean;
                 return true;
         }
         return obj.setProperty(property, v);

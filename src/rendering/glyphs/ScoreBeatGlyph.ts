@@ -12,6 +12,7 @@ import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { GhostNoteContainerGlyph } from '@src/rendering/glyphs/GhostNoteContainerGlyph';
 import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
+import { NoteHeadGlyph4Numbered } from '@src/rendering/glyphs/NoteHeadGlyph4Numbered';
 import { ScoreNoteChordGlyph } from '@src/rendering/glyphs/ScoreNoteChordGlyph';
 import { ScoreRestGlyph } from '@src/rendering/glyphs/ScoreRestGlyph';
 import { ScoreWhammyBarGlyph } from '@src/rendering/glyphs/ScoreWhammyBarGlyph';
@@ -30,13 +31,14 @@ import { PickStrokeGlyph } from '@src/rendering/glyphs/PickStrokeGlyph';
 import { PickStroke } from '@src/model/PickStroke';
 import { GuitarGolpeGlyph } from '@src/rendering/glyphs/GuitarGolpeGlyph';
 import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
+import { ScoreRestGlyph4Numbered } from './ScoreRestGlyph4Numberd';
 
 export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
     private _collisionOffset: number = -1000;
     private _skipPaint: boolean = false;
 
     public noteHeads: ScoreNoteChordGlyph | null = null;
-    public restGlyph: ScoreRestGlyph | null = null;
+    public restGlyph: ScoreRestGlyph | ScoreRestGlyph4Numbered | null = null;
 
     public override getNoteX(note: Note, requestedPosition: NoteXPosition): number {
         return this.noteHeads ? this.noteHeads.getNoteX(note, requestedPosition) : 0;
@@ -128,7 +130,9 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                         let group: GlyphGroup = new GlyphGroup(0, 0);
                         group.renderer = this.renderer;
                         for (let note of this.container.beat.notes) {
-                            this.createBeatDot(sr.getNoteLine(note), group);
+                            this.renderer.settings.core.numbered ? 
+                                this.createBeatDot(Math.ceil((this.renderer.bar.staff.standardNotationLineCount - 1) / 2) * 2, group) :
+                                this.createBeatDot(sr.getNoteLine(note), group);
                         }
                         this.addGlyph(group);
                     }
@@ -147,7 +151,9 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                     line -= 2;
                 }
 
-                const restGlyph = new ScoreRestGlyph(0, sr.getScoreY(line), this.container.beat.duration);
+                const restGlyph = this.renderer.settings.core.numbered ? 
+                    new ScoreRestGlyph4Numbered(0, sr.getScoreY(line), this.container.beat.duration):
+                    new ScoreRestGlyph(0, sr.getScoreY(line), this.container.beat.duration);
                 this.restGlyph = restGlyph;
                 restGlyph.beat = this.container.beat;
                 restGlyph.beamingHelper = this.beamingHelper;
@@ -219,17 +225,25 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         if (n.harmonicType === HarmonicType.Natural) {
             return new DiamondNoteHeadGlyph(0, 0, n.beat.duration, isGrace);
         }
-        return new NoteHeadGlyph(0, 0, n.beat.duration, isGrace);
+        return n.numbered ?
+            new NoteHeadGlyph4Numbered(0, 0, n.beat.duration, isGrace, n.displayValue) :
+            new NoteHeadGlyph(0, 0, n.beat.duration, isGrace);
     }
 
+    // 创建音符
     private createNoteGlyph(n: Note): void {
+        // 简谱的处理
+        const numbered = this.renderer.settings.core.numbered
+        n.numbered = numbered
+
         if (n.beat.graceType === GraceType.BendGrace && !n.hasBend) {
             return;
         }
         let sr: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
         let noteHeadGlyph: EffectGlyph = this.createNoteHeadGlyph(n);
         // calculate y position
-        let line: number = sr.getNoteLine(n);
+        // 简谱下固定一个位置
+        let line: number = numbered ? 1 : sr.getNoteLine(n);
         noteHeadGlyph.y = sr.getScoreY(line);
         this.noteHeads!.addNoteGlyph(noteHeadGlyph, n, line);
         if (n.harmonicType !== HarmonicType.None && n.harmonicType !== HarmonicType.Natural) {

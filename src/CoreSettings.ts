@@ -67,6 +67,11 @@ export class CoreSettings {
     public includeNoteBounds: boolean = false;
 
     /**
+     * Get or set whether the score is numbered musical notation.
+     */
+    public numbered: boolean = true;
+
+    /**
      * @target web
      */
     public constructor() {
