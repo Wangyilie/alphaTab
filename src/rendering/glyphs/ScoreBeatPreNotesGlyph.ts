@@ -113,8 +113,9 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
         let accidental: AccidentalType = sr.accidentalHelper.applyAccidental(n);
         let noteLine: number = sr.getNoteLine(n);
         let isGrace: boolean = this.container.beat.graceType !== GraceType.None;
+        const numbered = this.renderer.settings.core.numbered
         if (accidental !== AccidentalType.None) {
-            let g = new AccidentalGlyph(0, sr.getScoreY(noteLine), accidental, isGrace);
+            let g = new AccidentalGlyph(0, numbered ? 28 : sr.getScoreY(noteLine), accidental, isGrace, numbered);
             g.renderer = this.renderer;
             accidentals.addGlyph(g);
         }

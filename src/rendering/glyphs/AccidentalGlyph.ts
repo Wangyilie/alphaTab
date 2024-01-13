@@ -6,11 +6,13 @@ import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 export class AccidentalGlyph extends MusicFontGlyph {
     private _isGrace: boolean;
     private _accidentalType: AccidentalType;
+    private _numbered: boolean;
 
-    public constructor(x: number, y: number, accidentalType: AccidentalType, isGrace: boolean = false) {
+    public constructor(x: number, y: number, accidentalType: AccidentalType, isGrace: boolean = false, numbered: boolean = false) {
         super(x, y, isGrace ? NoteHeadGlyph.GraceScale : 1, AccidentalGlyph.getMusicSymbol(accidentalType));
         this._isGrace = isGrace;
         this._accidentalType = accidentalType;
+        this._numbered = numbered
     }
 
     private static getMusicSymbol(accidentalType: AccidentalType): MusicFontSymbol {
@@ -41,7 +43,7 @@ export class AccidentalGlyph extends MusicFontGlyph {
                 this.width = 18;
                 break;
             default:
-                this.width = 8;
+                this.width = this._numbered ? 15 : 8;
                 break;
         }
         this.width = this.width * (this._isGrace ? NoteHeadGlyph.GraceScale : 1) * this.scale;
