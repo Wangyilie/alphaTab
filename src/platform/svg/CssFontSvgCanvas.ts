@@ -1,6 +1,7 @@
 import { TextAlign } from '@src/platform/ICanvas';
 import { SvgCanvas } from '@src/platform/svg/SvgCanvas';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
+import { Duration } from '@src/model';
 
 /**
  * This SVG canvas renders the music symbols by adding a CSS class 'at' to all elements.
@@ -17,13 +18,14 @@ export class CssFontSvgCanvas extends SvgCanvas {
         symbol: MusicFontSymbol,
         centerAtPosition?: boolean,
         numberValue?: number,
-        pitch?: number
+        pitch?: number,
+        duration?: Duration
     ): void {
         if (symbol === MusicFontSymbol.None) {
             return;
         }
         numberValue === undefined ? this.fillMusicFontSymbolText(x, y, scale, `&#${symbol};`, centerAtPosition)
-            : this.fillMusicFontSymbolText4Numbered(x, y, scale, numberValue, pitch);
+            : this.fillMusicFontSymbolText4Numbered(x, y, scale, numberValue, pitch, duration);
     }
 
     public fillMusicFontSymbols(
@@ -69,7 +71,8 @@ export class CssFontSvgCanvas extends SvgCanvas {
         y: number,
         scale: number,
         numberValue?: number,
-        pitch?: number
+        pitch?: number,
+        duration?: Duration
     ): void {
         this.buffer += `<g transform="translate(${x} ${y})" class="at" style="font-size: 24px;"><text`;
         if (scale !== 1) {
@@ -83,10 +86,19 @@ export class CssFontSvgCanvas extends SvgCanvas {
 
         this.buffer += ` text-anchor="middle">${numberValue}</text>`;
         if (pitch) {
+            let diff: number = 1
+            switch(duration) {
+                case Duration.Eighth:
+                    diff = 2
+                    break
+                case Duration.Sixteenth:
+                    diff = 3
+                    break
+            }
             if (pitch < 0) {
-                this.buffer += `<circle r="2" cy="5" style="stroke: none; fill:${this.color.rgba};" />`;
+                this.buffer += `<circle r="2" cy="${5 * diff}" style="stroke: none; fill:${this.color.rgba};" />`;
                 if (pitch < -1) {
-                    this.buffer += `<circle r="2" cy="10" style="stroke: none; fill:${this.color.rgba};" />`;
+                    this.buffer += `<circle r="2" cy="${5 * (diff + 1)}" style="stroke: none; fill:${this.color.rgba};" />`;
                 }
             } else if (pitch > 0) {
                 this.buffer += `<circle r="2" cy="-21" style="stroke: none; fill:${this.color.rgba};" />`;

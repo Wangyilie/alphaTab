@@ -1,3 +1,4 @@
+import { Duration } from '@src/model';
 import { Color } from '@src/model/Color';
 import { Font } from '@src/model/Font';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
@@ -75,7 +76,8 @@ export interface ICanvas {
         symbol: MusicFontSymbol,
         centerAtPosition?: boolean,
         numberValue?: number,
-        pitch?: number
+        pitch?: number,
+        duration?: Duration
     ): void;
 
     fillMusicFontSymbols(

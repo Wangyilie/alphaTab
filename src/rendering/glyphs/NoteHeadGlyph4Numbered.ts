@@ -53,7 +53,7 @@ export class NoteHeadGlyph4Numbered extends MusicFontGlyph4Numbered {
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         let offset: number = this._isGrace ? this.scale : this.numberValue ? 23 : 0;
-        canvas.fillMusicFontSymbol(cx + this.x, cy + this.y + offset, this.glyphScale * this.scale, this.symbol, false, this.numberValue, this.pitch);
+        canvas.fillMusicFontSymbol(cx + this.x, cy + this.y + offset, this.glyphScale * this.scale, this.symbol, false, this.numberValue, this.pitch, this._duration);
     }
 
     public override doLayout(): void {
