@@ -402,7 +402,7 @@ export class BarRendererBase {
         if (!this.scoreRenderer.settings.core.numbered) this.paintBackground(cx, cy, canvas);
         canvas.color = this.resources.mainGlyphColor;
         // 绘制谱号 / 拍号
-        if (!this.scoreRenderer.settings.core.numbered) this._preBeatGlyphs.paint(cx + this.x, cy + this.y, canvas);
+        this._preBeatGlyphs.paint(cx + this.x, cy + this.y, canvas);
 
         for (const c of this._voiceContainers.values()) {
             canvas.color = c.voice.index === 0 ? this.resources.mainGlyphColor : this.resources.secondaryGlyphColor;

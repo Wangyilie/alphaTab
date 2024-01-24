@@ -245,7 +245,7 @@ export class StaveGroup {
         }
 
         // 控制简谱下不渲染
-        if (this.layout.renderer.settings.core.numbered) return;
+        // if (this.layout.renderer.settings.core.numbered) return;
 
         let res: RenderingResources = this.layout.renderer.settings.display.resources;
         if (this.staves.length > 0 && startIndex === 0) {

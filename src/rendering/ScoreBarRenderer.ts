@@ -121,7 +121,6 @@ export class ScoreBarRenderer extends BarRendererBase {
         super.paint(cx, cy, canvas);
 
         // 绘制音符符杆
-        // if (this.scoreRenderer.settings.core.numbered) return;
         this.paintBeams(cx, cy, canvas, this.scoreRenderer.settings.core.numbered);
         this.paintTuplets(cx, cy, canvas);
     }
@@ -200,6 +199,7 @@ export class ScoreBarRenderer extends BarRendererBase {
         let offset: number = 10 * this.scale;
         let size: number = 5 * this.scale;
 
+        const numbered = this.settings.core.numbered
         if (h.beats.length === 1 || !h.isFull) {
             for (let i: number = 0, j: number = h.beats.length; i < j; i++) {
                 let beat: Beat = h.beats[i];
@@ -209,7 +209,7 @@ export class ScoreBarRenderer extends BarRendererBase {
                 }
                 let direction: BeamDirection = beamingHelper.direction;
                 let tupletX: number = beamingHelper.getBeatLineX(beat);
-                let tupletY: number = this.calculateBeamYWithDirection(
+                let tupletY: number = numbered ? -25 : this.calculateBeamYWithDirection(
                     beamingHelper,
                     tupletX,
                     direction
@@ -261,12 +261,12 @@ export class ScoreBarRenderer extends BarRendererBase {
             let firstNonRestBeamingHelper = this.helpers.beamHelperLookup[h.voice.index].get(firstNonRestBeat.index)!;
             let lastNonRestBeamingHelper = this.helpers.beamHelperLookup[h.voice.index].get(lastNonRestBeat.index)!;
             let direction = firstBeamingHelper.direction;
-            let startY: number = this.calculateBeamYWithDirection(
+            let startY: number = numbered ? 2 : this.calculateBeamYWithDirection(
                 firstNonRestBeamingHelper,
                 startX,
                 direction
             );
-            let endY: number = this.calculateBeamYWithDirection(
+            let endY: number = numbered ? 2 :this.calculateBeamYWithDirection(
                 lastNonRestBeamingHelper,
                 endX,
                 direction
@@ -292,7 +292,7 @@ export class ScoreBarRenderer extends BarRendererBase {
             let offset1Y: number = k * offset1X + d;
             let middleY: number = k * middleX + d;
             let offset2Y: number = k * offset2X + d;
-            if (direction === BeamDirection.Down) {
+            if (direction === BeamDirection.Down && !numbered) {
                 offset *= -1;
                 size *= -1;
             }
@@ -783,10 +783,12 @@ export class ScoreBarRenderer extends BarRendererBase {
             this.addPreBeatGlyph(new RepeatOpenGlyph(0, 0, 1.5, 3));
         }
         // Clef
+        // 简谱下不显示谱号
         if (
-            this.isFirstOfLine ||
+            !this.settings.core.numbered &&
+            (this.isFirstOfLine ||
             this.bar.clef !== this.bar.previousBar!.clef ||
-            this.bar.clefOttava !== this.bar.previousBar!.clefOttava
+            this.bar.clefOttava !== this.bar.previousBar!.clefOttava)
         ) {
             let offset: number = 0;
             switch (this.bar.clef) {
