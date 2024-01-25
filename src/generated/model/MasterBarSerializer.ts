@@ -29,6 +29,7 @@ export class MasterBarSerializer {
         o.set("alternateendings", obj.alternateEndings);
         o.set("keysignature", obj.keySignature as number);
         o.set("keysignaturetype", obj.keySignatureType as number);
+        o.set("keysignaturestring", obj.keySignatureString);
         o.set("isdoublebar", obj.isDoubleBar);
         o.set("isrepeatstart", obj.isRepeatStart);
         o.set("repeatcount", obj.repeatCount);
@@ -61,6 +62,9 @@ export class MasterBarSerializer {
                 return true;
             case "keysignaturetype":
                 obj.keySignatureType = JsonHelper.parseEnum<KeySignatureType>(v, KeySignatureType)!;
+                return true;
+            case "keysignaturestring":
+                obj.keySignatureString = v! as string;
                 return true;
             case "isdoublebar":
                 obj.isDoubleBar = v! as boolean;

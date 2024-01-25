@@ -2,6 +2,8 @@ import { Duration } from '@src/model/Duration';
 import { ICanvas } from '@src/platform/ICanvas';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { MusicFontGlyph4Numbered } from './MusicFontGlyph4Numbered';
+import { KeySignatureType } from '@src/model/KeySignatureType';
+import { ModelUtils } from '@src/model/ModelUtils';
 
 export class NoteHeadGlyph4Numbered extends MusicFontGlyph4Numbered {
     public static readonly GraceScale: number = 0.75;
@@ -10,13 +12,6 @@ export class NoteHeadGlyph4Numbered extends MusicFontGlyph4Numbered {
     private _isGrace: boolean;
     private _duration: Duration;
 
-    // 36 \ 48 \ 60 \ 72 \ 84
-    // 38 \ 50 \ 62 \ 74 \ 86
-    // 40 \ 52 \ 64 \ 76 \ 88
-    // 41 \ 53 \ 65 \ 77 \ 89
-    // 43 \ 55 \ 67 \ 79 \ 91
-    // 45 \ 57 \ 69 \ 81 \ 93
-    // 47 \ 59 \ 71 \ 83 \ 95
     private static NoteValues = [
         '#36#48#60#72#84#', // c
         '#38#50#62#74#86#', // d
@@ -39,7 +34,10 @@ export class NoteHeadGlyph4Numbered extends MusicFontGlyph4Numbered {
     ]
     private static _isAccidental: boolean;
 
-    public constructor(x: number, y: number, duration: Duration, isGrace: boolean, displayValue: number) {
+    public constructor(x: number, y: number, duration: Duration, isGrace: boolean, displayValue: number, keySignatureString: string, keySignatureType: KeySignatureType) {
+        const resultValues = ModelUtils.getNoteValues(keySignatureString, keySignatureType);
+        NoteHeadGlyph4Numbered.NoteValues = resultValues[0];
+        NoteHeadGlyph4Numbered.AccidentalNoteValues = resultValues[1];
         super(x,
               y,
               isGrace ? NoteHeadGlyph4Numbered.GraceScale : 1,
@@ -48,7 +46,6 @@ export class NoteHeadGlyph4Numbered extends MusicFontGlyph4Numbered {
               NoteHeadGlyph4Numbered.getPitch(displayValue));
         this._isGrace = isGrace;
         this._duration = duration;
-        NoteHeadGlyph4Numbered._isAccidental = false
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
@@ -95,7 +92,9 @@ export class NoteHeadGlyph4Numbered extends MusicFontGlyph4Numbered {
         let index = NoteHeadGlyph4Numbered.NoteValues.findIndex(item => item.indexOf(displayString) >= 0);
         if (index === -1) {
             index = NoteHeadGlyph4Numbered.AccidentalNoteValues.findIndex(item => item.indexOf(displayString) >= 0);
-            this._isAccidental = index !== -1
+            this._isAccidental = true
+        } else {
+            this._isAccidental = false;
         }
         return index;
     }

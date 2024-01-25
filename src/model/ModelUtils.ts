@@ -5,6 +5,7 @@ import { Fingers } from '@src/model/Fingers';
 import { Score } from '@src/model/Score';
 import { FingeringMode } from '@src/NotationSettings';
 import { Settings } from '@src/Settings';
+import { KeySignatureType } from './KeySignatureType';
 
 export class TuningParseResult {
     public note: string | null = null;
@@ -245,5 +246,111 @@ export class ModelUtils {
             s = '0' + s;
         }
         return s;
+    }
+
+    /**
+     * 通过调性值与大小调两个参数，来返回一个由低两个8度、中间8度、高两个8度的音符值组成的二维数组
+     * 已知 C大调 / c小调 的 do 音音符值为 60
+     * 通过十二平均律的音程规律：大调的音程为 2212221，小调的音程为 2122212
+     * 返回一个二维数组，第一个元素为自然音的音符值数组，第二个元素为变调后(升音)的音符值数组
+     */
+    public static getNoteValues(keySignatureStirng: string, keySignatureType: KeySignatureType): string[][] {
+        let centerDoValue = ModelUtils.parseCenterDoValue(keySignatureStirng)
+        const isMajor = keySignatureType === KeySignatureType.Major
+        const majorIntervals = [2, 2, 1, 2, 2, 2, 1]
+        const minorIntervals = [2, 1, 2, 2, 1, 2, 2]
+        const intervals = isMajor ? majorIntervals : minorIntervals
+        const result: string[] = []
+        const resultAccidental: string[] = []
+
+        let i = 0
+        do {
+            const doValues = this.getOneDimNoteValue(centerDoValue)
+            const doValuesAccidental = this.getOneDimNoteValue(centerDoValue).map(item => item + 1)
+            result.push(`#${doValues.join('#')}#`)
+            resultAccidental.push(`#${doValuesAccidental.join('#')}#`)
+
+            centerDoValue += intervals[i]
+            i++
+        } while (i < intervals.length) // 循环7次即可，因为一个八度只有7个音，第8个音就是第一个音的八度
+
+        return [result, resultAccidental]
+    }
+
+    private static getOneDimNoteValue(noteValue: number): number[] {
+        const noteValues: number[] = []
+        for (let i = -2; i <= 2; i++) {
+            noteValues.push(noteValue + (12 * i))
+        }
+        return noteValues
+    }
+
+    /**
+     * 通过调号获取中间 Do 音值
+     * @param str 
+     * @returns 
+     */
+    public static parseCenterDoValue(str: string): number {
+        if (!str) str = 'c'
+        switch (str.toLowerCase()) {
+            case 'cb':
+            case 'cbmajor':
+                return 59;
+            case 'gb':
+            case 'gbmajor':
+            case 'g#minor':
+            case 'f#':
+            case 'f#minor':
+            case 'f#major':
+                return 66;
+            case 'ab':
+            case 'abmajor':
+                return 56;
+            case 'eb':
+            case 'ebmajor':
+            case 'ebminor':
+            case 'd#minor':
+                return 63;
+            case 'bb':
+            case 'bbmajor':
+            case 'bbminor':
+                return 58;
+            case 'f':
+            case 'fmajor':
+            case 'fminor':
+                return 65;
+            case 'c':
+            case 'cmajor':
+            case 'cminor':
+                return 60;
+            case 'g':
+            case 'gmajor':
+            case 'gminor':
+                return 67;
+            case 'd':
+            case 'dmajor':
+            case 'dminor':
+                return 62;
+            case 'a':
+            case 'amajor':
+            case 'aminor':
+                return 57;
+            case 'e':
+            case 'emajor':
+            case 'eminor':
+                return 64;
+            case 'b':
+            case 'bmajor':
+            case 'bminor':
+                return 59;
+            case 'c#':
+            case 'c#major':
+            case 'c#minor':
+            case 'db':
+            case 'dbmajor':
+                return 61;
+            default:
+                return 60;
+        }
     }
 }

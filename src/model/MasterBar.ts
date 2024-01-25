@@ -52,6 +52,11 @@ export class MasterBar {
     public keySignatureType: KeySignatureType = KeySignatureType.Major;
 
     /**
+     * Gets or sets the key signature string.
+     */
+    public keySignatureString: string = '';
+
+    /**
      * Gets or sets whether a double bar is shown for this masterbar.
      */
     public isDoubleBar: boolean = false;

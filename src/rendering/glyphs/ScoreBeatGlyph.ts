@@ -225,8 +225,10 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         if (n.harmonicType === HarmonicType.Natural) {
             return new DiamondNoteHeadGlyph(0, 0, n.beat.duration, isGrace);
         }
+        const keySignatureString = n.beat.voice.bar.masterBar.keySignatureString;
+        const keySignatureType = n.beat.voice.bar.masterBar.keySignatureType;
         return n.numbered ?
-            new NoteHeadGlyph4Numbered(0, 0, n.beat.duration, isGrace, n.displayValue) :
+            new NoteHeadGlyph4Numbered(0, 0, n.beat.duration, isGrace, n.displayValue, keySignatureString, keySignatureType) :
             new NoteHeadGlyph(0, 0, n.beat.duration, isGrace);
     }
 

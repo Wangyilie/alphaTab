@@ -551,6 +551,7 @@ export class CapellaParser {
             if (master.index > 0) {
                 master.keySignature = master.previousMasterBar!.keySignature;
                 master.keySignatureType = master.previousMasterBar!.keySignatureType;
+                master.keySignatureString = master.previousMasterBar!.keySignatureString
                 master.tripletFeel = master.previousMasterBar!.tripletFeel;
             }
 
