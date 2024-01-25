@@ -816,8 +816,9 @@ export class ScoreBarRenderer extends BarRendererBase {
         }
         // Key signature
         if (
-            (this.index === 0 && this.bar.masterBar.keySignature !== KeySignature.C) ||
-            (this.bar.previousBar && this.bar.masterBar.keySignature !== this.bar.previousBar.masterBar.keySignature)
+            !this.settings.core.numbered &&
+            ((this.index === 0 && this.bar.masterBar.keySignature !== KeySignature.C) ||
+            (this.bar.previousBar && this.bar.masterBar.keySignature !== this.bar.previousBar.masterBar.keySignature))
         ) {
             this.createStartSpacing();
             this.createKeySignatureGlyphs();
