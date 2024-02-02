@@ -54,7 +54,7 @@ export class MasterBar {
     /**
      * Gets or sets the key signature string.
      */
-    public keySignatureString: string = '';
+    public keySignatureString: string = 'C';
 
     /**
      * Gets or sets whether a double bar is shown for this masterbar.
