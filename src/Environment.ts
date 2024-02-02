@@ -59,6 +59,7 @@ import { AlphaSynthWebWorklet } from '@src/platform/javascript/AlphaSynthAudioWo
 import { AlphaTabError, AlphaTabErrorType } from './AlphaTabError';
 import { SkiaCanvas } from './platform/skia/SkiaCanvas';
 import { Font } from './model';
+import { KeySignature4NumberedEffectInfo } from './rendering/effects/KeySignature4NumberedEffectInfo';
 
 export class LayoutEngineFactory {
     public readonly vertical: boolean;
@@ -465,6 +466,7 @@ export class Environment {
         ]);
         staveProfiles.set(StaveProfile.Score, [
             new EffectBarRendererFactory('score-effects', [
+                new KeySignature4NumberedEffectInfo(),
                 new TempoEffectInfo(),
                 new TripletFeelEffectInfo(),
                 new MarkerEffectInfo(),

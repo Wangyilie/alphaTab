@@ -287,7 +287,12 @@ export enum NotationElement {
     /**
      * The left hand tap symbol shown above the staff.
      */
-    EffectLeftHandTap
+    EffectLeftHandTap,
+
+    /**
+     * 为简谱使用的调性
+     */
+    KeySignature4Numbered
 }
 
 /**
